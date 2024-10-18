@@ -1,33 +1,12 @@
 const Cliente = require("./models/cliente");
 const Direccion = require("./models/direccion");
+const Empleado = require("./models/empleado");
 const Orden = require("./models/orden");
 
-
-const jugandoAsociacionesPerezosa = async () => {
+const findByIdClienteAndOrdenesLazy = async (id) => {
     const cliente = await Cliente.findOne({
         where: {
-            id: 1
-        }
-    });
-    console.log(cliente.dataValues);
-    const direccion = await cliente.getDireccion();
-    console.log(direccion.dataValues);
-}
-
-const jugandoAsociacionesAnsiosa = async () => {
-    const cliente = await Cliente.findOne({
-        where: {
-            id: 1
-        },
-        include: Direccion
-    });
-    console.log(cliente.toJSON());
-}
-
-const jugandoAsociacionesPeresozaOneToMany = async () => {
-    const cliente = await Cliente.findOne({
-        where: {
-            id: 1
+            id
         }
     });
     console.log(cliente.toJSON());
@@ -38,14 +17,37 @@ const jugandoAsociacionesPeresozaOneToMany = async () => {
     console.log(ordenesJson);
 }
 
-const jugandoAsociacionesAnsiosaOneToMany = async () => {
+const findByIdClienteAndOrdenesEager = async (id) => {
     const cliente = await Cliente.findOne({
         where: {
-            id: 1
+            id
         },
         include: Orden
     });
-    console.log(cliente.toJSON());   
+    console.log(cliente.toJSON());
 }
 
-jugandoAsociacionesAnsiosaOneToMany();
+const findAllEmpleadosAndOrdenesLazy = async () => {
+    const empleados = await Empleado.findAll();
+    const empleadosJson = empleados.map((empleado) => {
+        return empleado.toJSON();
+    });
+    console.log(empleadosJson);
+    empleados.forEach(async (empleado) => {
+        const ordenesEmpleados = await empleado.getOrdens(); 
+        console.log(ordenesEmpleados);
+    });
+}
+
+const findAllEmpleadosAndOrdenesEager = async () => {
+    const empleados = await Empleado.findAll({
+        include: Orden
+    });
+    const empleadosJson = empleados.map((empleado) => {
+        return empleado.toJSON();
+    });
+    console.log(empleadosJson);
+    
+}
+
+findAllEmpleadosAndOrdenesEager();
